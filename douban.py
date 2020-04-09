@@ -117,7 +117,7 @@ def retry(url):
             return html, code
     return '',403
 
-def spyder(vedio_info):
+def spider(vedio_info):
     '''
     :param vedio_info: 视频信息
     :return:
@@ -184,7 +184,7 @@ def start():
                     video_info.append(a.get("href").split('/')[-2])
                     video_info.append(a.text)
             print(video_info)
-            spyder(video_info)
+            spider(video_info)
             video_info.clear()
 start()
 
