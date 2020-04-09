@@ -24,6 +24,35 @@ user_agent = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.20 (KHTML, like Gecko) Chrome/19.0.1036.7 Safari/535.20",
     "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52"
 ]
+
+cookie = {
+    "_vwo_uuid_v2": "D18F3A0D5AC1B13253E742D69AA27C375|6654eb8c8c6efdf3cf5d7ca843d2b1cb",
+    "douban-fav-remind": "1",
+    "gr_user_id": "8c9be3bc-f76d-426d-990f-ea47793d59e1",
+    "__gads": "ID=168106bff2009de1:T=1573230815:S=ALNI_MYj831gAJr67fAthACvB75dZnr3kw",
+    "bid": "dHx9N35gAGY",
+    "__yadk_uid": "fu5EPjUDcHvpP4EkG958S0RF1aU4K934",
+    "viewed": "\"5940794_34878342_26887949_24722612_25859528_26749084_30360968_25794324_2062279_1139336\"",
+    "push_noty_num": "0",
+    "push_doumail_num": "0",
+    "douban-profile-remind": "1",
+    "ct": "y",
+    "ll": "\"118254\"",
+    "_ga": "GA1.2.1555112521.1542036345",
+    "ap_v": "0,6.0",
+    "_pk_ref.100001.8cb4": "%5B%22%22%2C%22%22%2C1586442658%2C%22https%3A%2F%2Fmovie.douban.com%2Fsubject%2F33434927%2F%22%5D",
+    "_pk_ses.100001.8cb4": "*",
+    "__utma": "30149280.1555112521.1542036345.1586443149.1586443149.1",
+    "__utmc": "30149280",
+    "__utmz": "30149280.1586443149.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)",
+    "__utmv": "30149280.18809",
+    "dbcl2": "\"188090156:wKSB+iaRgNc\"",
+    "ck": "1sUG",
+    "__utmt": "1",
+    "_pk_id.100001.8cb4": "d77fbd4319b4fedf.1578998743.15.1586444000.1586240572.",
+    "__utmb": "30149280.26.10.1586443149"
+}
+
 HEADER = {
     'User-Agent': user_agent[0],  # 浏览器头部
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',  # 客户端能够接收的内容类型
@@ -31,8 +60,9 @@ HEADER = {
     'Connection': 'keep-alive',  # 表示是否需要持久连接
 }
 
+
 def random_HEADER():
-    index =  random.randint(0,len(user_agent)-1)
+    index = random.randint(0, len(user_agent) - 1)
     HEADER = {
         'User-Agent': user_agent[index],  # 浏览器头部
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',  # 客户端能够接收的内容类型
@@ -40,9 +70,10 @@ def random_HEADER():
         'Connection': 'keep-alive',  # 表示是否需要持久连接
     }
     return HEADER
+
+
 # 30482003
 base_url = "https://movie.douban.com/subject/{}/comments?start={}&limit={}&sort=new_score&status=P"
-
 
 
 def getHTMLText(url):
@@ -51,7 +82,7 @@ def getHTMLText(url):
     :param url: 需要爬取数据的网址
     :return:
     '''
-    r = requests.get(url, headers=random_HEADER())
+    r = requests.get(url, cookies=cookie, headers=random_HEADER())
     # print("status_code: ", r.status_code)
     #         r.raise_for_status()
     #         r.encoding = r.apparent_encoding
@@ -68,6 +99,7 @@ def get_userinfos(soup):
         # user_infos[id] = {"username": username, "url": url}
     return id, username, url
 
+
 def get_comments(soup):
     comments = soup.findAll(name="span", attrs={"class": "short"})
     for comment in comments:
@@ -75,17 +107,17 @@ def get_comments(soup):
         # user_infos[id] = {"username": username, "url": url}
     return _comment
 
+
 # <span class="allstar10 rating" title="很差"></span>
 def get_rating(soup):
     rating = soup.find(name="span", attrs={"class": re.compile(r"allstar(\w+)?")})
-    if(rating):
+    if (rating):
         rate = rating.get('title')
         return rate
     return ''
 
 
-
-def parser(html,vedio_info,user_infos):
+def parser(html, vedio_info, user_infos):
     '''
 
     :param html: html文本
@@ -96,26 +128,28 @@ def parser(html,vedio_info,user_infos):
     # user_infos = []
     soup = BeautifulSoup(html, 'html.parser')
     comments = soup.findAll(name="div", attrs={"class": "comment"})
-    if(len(comments)) < 1:
+    if (len(comments)) < 1:
         return "over"
     # print(comments)
     for comment in comments:
-        comment_tag = BeautifulSoup(str(comment),'html.parser')
+        comment_tag = BeautifulSoup(str(comment), 'html.parser')
         id, username, url = get_userinfos(comment_tag)
         _comment = get_comments(comment_tag)
         rate = get_rating(comment_tag)
         # user_infos[id] = {"username": username, "url": url}
         # user_infos.append({"id":id,"username": username, "url": url,"comment":_comment})
-        user_infos.append((id, username, url,vedio_info[-1],rate,_comment))
+        user_infos.append((id, username, url, vedio_info[-1], rate, _comment))
     # return user_infos
 
+
 def retry(url):
-    for i in range(1,6):
+    for i in range(1, 6):
         html, code = getHTMLText(url)
         # print("retry: ",code)
         if code == 200:
             return html, code
-    return '',403
+    return '', 403
+
 
 def spider(vedio_info):
     '''
@@ -126,31 +160,33 @@ def spider(vedio_info):
     user_infos = []
     retry_time = 0
     while (True):
-        url = base_url.format(vedio_info[1],index, 20)
+        url = base_url.format(vedio_info[1], index, 20)
         print(url)
         html, code = getHTMLText(url)
         if index == 400:
             print("debug")
         if code == 403:
             html, code = retry(url)
-            if code != 200 and retry_time<5:
-                print("Retry :", retry_time," code: ",code)
+            if code != 200 and retry_time < 5:
+                print("Retry :", retry_time, " code: ", code)
                 retry_time += 1
                 index += 20
                 continue
             else:
                 print("Retry over the limit , Over ")
                 break
-        if parser(html,vedio_info,user_infos) == "over":
+        if parser(html, vedio_info, user_infos) == "over":
             break
         index += 20
     print("get {} infos:".format(len(user_infos)))
-    save2csv(user_infos,vedio_info)
+    save2csv(user_infos, vedio_info[-2] + ".csv", ['uid', 'name', 'url', 'movie_name', 'rating', 'comment'])
 
-def save2csv(list,vedio_info):
-    out = open(vedio_info[-1]+".csv","w")
+
+# ['uid', 'name','url','movie_name','rating','comment']
+def save2csv(list, filename, title):
+    out = open(filename, "w")
     csv_out = csv.writer(out)
-    csv_out.writerow(['uid', 'name','url','movie_name','rating','comment'])
+    csv_out.writerow(title)
     for row in list:
         csv_out.writerow(row)
 
@@ -159,18 +195,18 @@ def save2csv(list,vedio_info):
 #                 <img src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2572166063.jpg" alt="少年的你" data-x="5906" data-y="8268">
 #             </div>
 
-def start():
+def get_billboard_comment():
     '''
     爬取豆瓣电影一周口碑榜的评论以及用户信息
     :return:
     '''
-    html,code = getHTMLText("https://movie.douban.com/")
+    html, code = getHTMLText("https://movie.douban.com/")
     soup = BeautifulSoup(html, 'html.parser')
-    billboards = soup.findAll(name="div", attrs={"id":"billboard"})
+    billboards = soup.findAll(name="div", attrs={"id": "billboard"})
     for billboard in billboards:
         # billboard = BeautifulSoup(str(billboard),'html.parser')
-        table = billboard.find(name='div',attrs={'class':'billboard-bd'})
-        table = BeautifulSoup(str(table),'html.parser')
+        table = billboard.find(name='div', attrs={'class': 'billboard-bd'})
+        table = BeautifulSoup(str(table), 'html.parser')
         tables = table.findAll('table')
         tab = tables[0]
         # print(tab)
@@ -186,6 +222,41 @@ def start():
             print(video_info)
             spider(video_info)
             video_info.clear()
-start()
 
 
+def get_douban_xiaozu():
+    '''
+
+    爬取豆瓣小组成员信息 ，斌看这里
+    :param vedio_info: 视频信息
+    :return:
+    '''
+    index = 0
+    user_infos = []
+    base_url = "https://www.douban.com/group/20106/members?start={}"
+    retry_time = 0
+    while (True):
+        if index > 80000:
+            break
+        url = base_url.format(index)
+        print(url)
+        html, code = getHTMLText(url)
+        if code == 403:
+            break
+        soup = BeautifulSoup(html, 'html.parser')
+        members = soup.findAll(name="div", attrs={"class": "member-list"})
+        ul = BeautifulSoup(str(members), 'html.parser').findAll(name="ul")
+        for li in BeautifulSoup(str(ul), 'html.parser').findAll(name="li"):
+            name_soup = BeautifulSoup(str(li), 'html.parser').find(name="div", attrs={"class": "name"})
+            a = BeautifulSoup(str(name_soup), 'html.parser').find(name="a")
+            name = a.text
+            url = a.get("href")
+            uid = url.split('/')[-2]
+            user_infos.append((uid, name, url))
+        # print(user_infos)
+        index += 35
+    save2csv(user_infos, "豆瓣小组.csv", ['uid', 'name', 'url'])
+
+
+# get_billboard_comment()
+get_douban_xiaozu()
