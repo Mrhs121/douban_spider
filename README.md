@@ -1,4 +1,4 @@
-# douban_spyder
+# douban_spider
 ## 豆瓣爬虫，爬取豆瓣电影一周口碑榜的评论以及用户信息
 ## 爬取结果
 
