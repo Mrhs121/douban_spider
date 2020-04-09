@@ -26,7 +26,7 @@ user_agent = [
 ]
 
 cookie = {
-    "_vwo_uuid_v2": "D18F3A0D5AC1B13253E742D69AA27C375|6654eb8c8c6efdf3cf5d7ca843d2b1cb",
+    "_vwo_uuid_v2": "",
     "douban-fav-remind": "1",
     "gr_user_id": "8c9be3bc-f76d-426d-990f-ea47793d59e1",
     "__gads": "ID=168106bff2009de1:T=1573230815:S=ALNI_MYj831gAJr67fAthACvB75dZnr3kw",
